@@ -2,44 +2,42 @@
     <head>
         <script src="fernet.js"></script>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-        <style>
-            small {
-                font-weight: 300;
-            }
-        </style>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="msapplication-TileImage" content="https://ofnc.ca/wp-content/uploads/2020/03/facicon.png" />
+        <link rel="icon" href="https://ofnc.ca/wp-content/uploads/2020/03/facicon.png" sizes="32x32" />
+        <link rel="icon" href="https://ofnc.ca/wp-content/uploads/2020/03/facicon.png" sizes="192x192" />
+        <link rel="apple-touch-icon" href="https://ofnc.ca/wp-content/uploads/2020/03/facicon.png" />   
+        <title>OFNC Membership Portal</title>
+        <link rel="stylesheet" href="style.css">
     </head>
     <body>
-        <h1>Hi</h1>
-        <input id="passwordInput" type="password" placeholder="password"/>
-        <button id="goButton">Get All Members</button>
-        <div id="results"></div>
-        <script>
-            $("#goButton").click(()=>{
-                $.get("https://achamney.pythonanywhere.com/0e4270d8-3eb6-11ed-acaa-0ae52db41295").then((res)=>{
-                    var json = JSON.parse(res)
-                    var secret = $("#passwordInput").val()
-                    for (var i=0;i<32-6;i++)
-                        secret = `${secret}0`;
-                    var fernSecret = new fernet.Secret(btoa(secret));
-                    var memberContainer = $("#results");
-                    for (var member of json.members) {
-                        for (var memberKey in member) {
-                            if (member[memberKey] == "None")
-                                continue;
-                            var stripBinary = member[memberKey].substr(2,member[memberKey].length - 3);
-                            console.log(stripBinary)
-                            var token = new fernet.Token({
-                                secret: fernSecret,
-                                token: stripBinary,
-                                ttl: 0
-                            });
-                            member[memberKey] = token.decode();
-                        }
-                        memberContainer.append($(`<div><h3>${member.Surname1} <small>${member.Email}</small></h3></div>`));
-                    }
-                    console.log(json);
-                });
-            });
-        </script>
+        <div class="container">
+            <h1>OFNC Membership Portal</h1>
+            <br/>
+            <div class="flex">
+                <span>
+                    Search By Last Name<br/>
+                    <input id="lastNameInput" type="text"/>
+                </span>
+                <span>
+                    Search By Email<br/>
+                    <input id="emailInput" type="text"/>
+                </span>
+                <span>Clear<br/><button id="clearInputsButton">x</button></span>
+            </div>
+            <div id="results"></div>
+            <div class="overlay" id="dbInfoOverlay"><div class="overlay-inner">
+                <h1>Enter Membership Password</h1>
+                <div class="form" id="passwordForm">
+                    <label for="password">Password:</label>
+                    <input id="password" type="password" placeholder="Password" style="width:70%" autofocus><br>
+                    <button id="passwordButton">Proceed</button>
+                    <br>
+                    <i>Version 0.1</i>
+                </div>
+            </div></div>
+        </div>
+        <script src="main.js"></script>
+        <script src="modal.js"></script>
     </body>
 </html>
