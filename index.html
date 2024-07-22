@@ -1,0 +1,45 @@
+<html>
+    <head>
+        <script src="fernet.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+        <style>
+            small {
+                font-weight: 300;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>Hi</h1>
+        <input id="passwordInput" type="password" placeholder="password"/>
+        <button id="goButton">Get All Members</button>
+        <div id="results"></div>
+        <script>
+            $("#goButton").click(()=>{
+                $.get("https://achamney.pythonanywhere.com/0e4270d8-3eb6-11ed-acaa-0ae52db41295").then((res)=>{
+                    var json = JSON.parse(res)
+                    var secret = $("#passwordInput").val()
+                    for (var i=0;i<32-6;i++)
+                        secret = `${secret}0`;
+                    var fernSecret = new fernet.Secret(btoa(secret));
+                    var memberContainer = $("#results");
+                    for (var member of json.members) {
+                        for (var memberKey in member) {
+                            if (member[memberKey] == "None")
+                                continue;
+                            var stripBinary = member[memberKey].substr(2,member[memberKey].length - 3);
+                            console.log(stripBinary)
+                            var token = new fernet.Token({
+                                secret: fernSecret,
+                                token: stripBinary,
+                                ttl: 0
+                            });
+                            member[memberKey] = token.decode();
+                        }
+                        memberContainer.append($(`<div><h3>${member.Surname1} <small>${member.Email}</small></h3></div>`));
+                    }
+                    console.log(json);
+                });
+            });
+        </script>
+    </body>
+</html>
