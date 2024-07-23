@@ -1,4 +1,13 @@
 $("#passwordButton").click(()=>{
+    login();
+});
+const loginEnter = $("body").on('keypress',(e) => {
+    if(e.which == 13) {
+        loginEnter.off();
+        login();
+    }
+});
+function login(){
     $('#dbInfoOverlay').hide();
     var lastFetchedMemberInfo = localStorage.getItem("membershipInfo") || '{"lastUpdated":100}';
     lastFetchedMemberInfo = JSON.parse(lastFetchedMemberInfo);
@@ -20,7 +29,7 @@ $("#passwordButton").click(()=>{
         decode(lastFetchedMemberInfo);
         window.membershipInfo = lastFetchedMemberInfo;
     }
-});
+}
 $("#clearInputsButton").click(()=>{
     $("#lastNameInput").val("");
     $("#emailInput").val("");
@@ -45,6 +54,7 @@ const oneHourAgo = (date) => {
 function displayMemberInfo(memberInfo, filterKey1, filterKey2, filterValue){
     var memberContainer = $("#results");
     memberContainer.empty();
+    memberContainer.append($(`<div>Membership info last updated ${memberInfo.timeOfUpdate}</div><br/>`));
     filterValue = filterValue.toUpperCase();
     for (var member of memberInfo.members) {
         if (~member[filterKey1].toUpperCase().indexOf(filterValue) || (member[filterKey2] && ~member[filterKey2].toUpperCase().indexOf(filterValue))) {
